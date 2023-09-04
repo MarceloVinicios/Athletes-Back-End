@@ -1,18 +1,20 @@
 const express = require("express");
 const router = express.Router();
+const userService = require("../services/userService");
+const checkJwt = require("../middleware/authToken");
 
-let userService = require("../services/userService");
-
-router.get("/", async (req, res) => {
+router.get("/user/token", checkJwt, async (req, res) => {
   try {
-    const userResponse = await userService.create();
-    res
-      .status(userResponse.statusCode)
-      .json({ response: userResponse.response });
+    const accessToken = req.headers.authorization.split(" ")[1];
+    const responseCreate = await userService.acessToken(accessToken);
+    req.user = responseCreate.data;
+    console.log(req.user)
+
+    res.status(200).json({msg: 'Acess token successfully'});
   } catch (error) {
     res
       .status(500)
-      .json({ error: "failed to create user", message: error.message });
+      .json({ error: "Error getting token", message: error.message });
   }
 });
 
