@@ -11,6 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "auth0": "^3.7.0",
+>>>>>>> a7515ec364103879d1c868f74cf65f3b38237f55
     "aws-sdk": "^2.1450.0",
     "axios": "^1.5.0",
     "cors": "^2.8.5",

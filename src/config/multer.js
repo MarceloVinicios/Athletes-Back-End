@@ -40,9 +40,7 @@ const storageTypes = {
 
         cb(null, fileName);
       });
-    },
-  }),
-};
+    },})}
 
 module.exports = {
   dest: path.resolve(__dirname, "..", "uploads"),

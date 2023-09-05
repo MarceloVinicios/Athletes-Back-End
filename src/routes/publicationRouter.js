@@ -11,6 +11,7 @@ const publicationModel = require("../models/PublicationModel")
 router.post("/publication", multer(multerConfig).single('file'), async (req, res) => {
   const {originalname: name, size, key, location: url} = req.file
 
+
   try {
     const responseModel = await publicationModel.create(
       name,
@@ -18,11 +19,6 @@ router.post("/publication", multer(multerConfig).single('file'), async (req, res
       key,
       url
     )
-
-    console.log(   name,
-      size,
-      key,
-      url)
 
     res.json({hello: 'Luiz'});
   } catch (error) {
