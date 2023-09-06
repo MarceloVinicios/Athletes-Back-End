@@ -12,8 +12,8 @@ class User_Model {
 
   async getFindById(id) {
     try {
-      await knex.select().where({id}).table("user");
-      return { status: true };
+      const user = await knex.select().where({id}).table("user");
+      return { status: true, response: user };
     } catch (error) {
       return { status: false, err: "error getting user", msg: error.message };
     };
