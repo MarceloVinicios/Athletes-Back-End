@@ -9,7 +9,6 @@ router.get("/user/token", checkJwt, async (req, res) => {
     const accessToken = req.headers.authorization.split(" ")[1];
     const responseCreate = await userService.acessToken(accessToken);
     req.user = responseCreate.data;
-    console.log(req.user);
 
     res.status(200).json({ msg: "Acess token successfully" });
   } catch (error) {

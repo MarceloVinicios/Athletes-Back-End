@@ -3,7 +3,6 @@ const path = require("path");
 const crypto = require("crypto");
 const { S3 } = require("aws-sdk");
 const multerS3 = require("multer-s3-transform");
-const sharp = require("sharp");
 
 // Configuração das credenciais da AWS
 const s3 = new S3({
@@ -20,9 +19,7 @@ const storageTypes = {
     filename: (req, file, cb) => {
       crypto.randomBytes(16, (err, hash) => {
         if (err) cb(err);
-
         file.key = `${hash.toString("hex")}-${file.originalname}`;
-
         cb(null, file.key);
       });
     },
@@ -35,26 +32,14 @@ const storageTypes = {
     key: (req, file, cb) => {
       crypto.randomBytes(16, (err, hash) => {
         if (err) cb(err);
-
         const fileName = `${hash.toString("hex")}-${file.originalname}`;
-
         cb(null, fileName);
       });
-    },})}
+    },
+  }),
+};
 
 module.exports = {
   dest: path.resolve(__dirname, "..", "uploads"),
   storage: storageTypes[process.env.STORAGE_TYPE],
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedMimes = ["image/jpeg", "image/png", "image/gif", "image/pjpeg"];
-
-    if (allowedMimes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Invalid file type"));
-    }
-  },
 };

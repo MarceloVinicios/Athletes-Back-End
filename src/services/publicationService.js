@@ -1,28 +1,44 @@
 const PublicationModel = require('../models/PublicationModel');
 
 class Publication_Service {
-  async getAll() {};
-
-  async get() {
+  async getAll() {
+    try {
+      
+    } catch (error) {
+      return {statusCode: 500, error: "Failed to create publication", message: error.message}
+    }
   };
 
-  async create(title, description) {
-    if (title == undefined ||title == "") {
-      return {status: false, statusCode: 400, msg: 'Title is required'};
-    };
+  async get() {
+    try {
+      
+    } catch (error) {
+      return {statusCode: 500, error: "Failed to create publication", message: error.message}
+    }
+  };
 
-    const responseCreate = await PublicationModel.create(title, description);
-    if (!responseCreate.status) {
-      return {status: false, statusCode: 500, msg: responseCreate.err};
-    };
-
-    return {status: true};
+  async create(description, url, user_id) {
+    try {
+      
+    } catch (error) {
+      return {statusCode: 500, error: "Failed to create publication", message: error.message}
+    }
   };
 
   async update() {
+    try {
+      
+    } catch (error) {
+      return {statusCode: 500, error: "Failed to create publication", message: error.message}
+    }
   };
 
   async delete() {
+    try {
+      
+    } catch (error) {
+      return {statusCode: 500, error: "Failed to create publication", message: error.message}
+    }
   };
 };
 

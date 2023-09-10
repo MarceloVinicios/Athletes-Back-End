@@ -6,19 +6,11 @@ const multerConfig = require('../config/multer');
 const publicationService = require("../services/publicationService");
 const userService = require("../services/userService");
 
-const publicationModel = require("../models/PublicationModel")
-
 router.post("/publication", multer(multerConfig).single('file'), async (req, res) => {
-  const {originalname: name, size, key, location: url} = req.file
-
-
   try {
-    const responseModel = await publicationModel.create(
-      name,
-      size,
-      key,
-      url
-    )
+    const {location: url = `${process.env.APP_URL}/files/${key}`, user_id} = req.file;
+    const {description} = req.body;
+    const responsePublication = await publicationService.create(description, url, user_id);
 
     res.json({hello: 'Luiz'});
   } catch (error) {
