@@ -19,9 +19,18 @@ class Publication_Service {
 
   async create(description, url, user_id) {
     try {
-      
+      if (description == 0 && url == 0) {
+        return {statusCode: 400, response: "Description or url is required"};
+      }
+
+      const responseCreatePublication = await PublicationModel.create(description, url, user_id);
+      if (!responseCreatePublication.status) {
+        return {statusCode: 500, response: responseCreatePublication.err}
+      }
+    
+      return {statusCode: 200, response: "Publication created successfully"}
     } catch (error) {
-      return {statusCode: 500, error: "Failed to create publication", message: error.message}
+      return {statusCode: 500, response: error.message}
     }
   };
 
