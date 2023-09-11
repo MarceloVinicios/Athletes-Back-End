@@ -6,7 +6,7 @@ class Publication_Model {
       await knex.select().table("publication");
       return { status: true };
     } catch (error) {
-      return { status: false, err: "error getting all posts", msg: error.message };
+      return { status: false, err: "error getting all posts"};
     };
   };
 
@@ -15,16 +15,16 @@ class Publication_Model {
       await knex.select().where(id).table("publication");
       return { status: true };
     } catch (error) {
-      return { status: false, err: "error getting publication", msg: error.message };
+      return { status: false, err: "error getting publication"};
     };
   };
 
-  async create(name, size, key, url) {
+  async create(description, url, user_id) {
     try {
-      await knex.insert({name, size, key, url}).table("publication");
+      await knex.insert({description, url, user_id}).table("publication");
       return { status: true };
     } catch (error) {
-      return { status: false, err: "error saving publication", msg: error.message };
+      return { status: false, err: "error saving publication"};
     };
   };
 
@@ -33,7 +33,7 @@ class Publication_Model {
       await knex.update({name, size, key, url}).where(id).table("publication");
       return { status: true };
     } catch (error) {
-      return { status: false, err: "error update publication", msg: error.message };
+      return { status: false, err: "error update publication"};
     };
   };
 
@@ -42,7 +42,7 @@ class Publication_Model {
       await knex.delete().where(id).table("publication");
       return { status: true };
     } catch (error) {
-      return { status: false, err: "error publication", msg: error.message };
+      return { status: false, err: "error publication"};
     };
   };
 };
