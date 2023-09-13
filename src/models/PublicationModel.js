@@ -1,16 +1,23 @@
 const knex = require("../database/connection");
 
 class Publication_Model {
-  async getAll() {
-    try {
-      await knex.select().table("publication");
-      return { status: true };
-    } catch (error) {
-      return { status: false, err: "error getting all posts"};
-    };
-  };
+// Dentro de PublicationModel
+async getAllPublications() {
+  try {
+    const publications = await knex.select().table("publication");
+    const publicationsWithUserDetails = await Promise.all(publications.map(async (publication) => {
+      const user = await knex.select().table("user").where({ id: publication.user_id }).first();
+      return { ...publication, user };
+    }));
+    
+    return { status: true, response: publicationsWithUserDetails };
+  } catch (error) {
+    return { status: false, err: "Failed to retrieve publications" };
+  }
+}
 
-  async getOne(id) {
+
+  async getOnePublication(id) {
     try {
       await knex.select().where(id).table("publication");
       return { status: true };
