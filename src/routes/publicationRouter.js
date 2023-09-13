@@ -21,14 +21,18 @@ router.post("/publication", multer(multerConfig).single("file"), async (req, res
   try {
     const { description } = req.body;
     const user_id = 1;
-    let url = null;
+    let urlLocal = null;
 
     if (req.file) {
-      const { key } = req.file;
-      url = `${process.env.APP_URL}/files/${key}`;
+      const { key,  location: url} = req.file;
+      if (url === undefined) {
+        urlLocal = `${process.env.APP_URL}/files/${key}` 
+      } else {
+        urlLocal = url;
+      }
     }
 
-    const responsePublication = await publicationService.create(description, url, user_id);
+    const responsePublication = await publicationService.create(description, urlLocal, user_id);
 
     res.status(responsePublication.statusCode)
       .json({ response: responsePublication.response });
@@ -37,6 +41,21 @@ router.post("/publication", multer(multerConfig).single("file"), async (req, res
       .json({ error: "Error saving publication", message: error.message });
   }
 });
+
+router.put("/publication/:id", multer(multerConfig).single("file"), async (req, res) => {
+  
+})
+
+router.delete("/publication/:id", async (req, res) => {
+  try {
+    const responseDeletePublication = await publicationService(req.params.id)
+
+    res.status(200).json({response: "jujutsu"})
+  } catch (error) {
+    res.status(500)
+      .json({ error: "Error saving publication", message: error.message });
+  }
+})
 
 
 module.exports = router;
