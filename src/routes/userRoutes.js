@@ -22,20 +22,18 @@ router.post("/user", checkJwt, async (req, res) => {
   const accessToken = req.headers.authorization.split(" ")[1];
   const responseCreate = await userService.acessToken(accessToken);
   req.user = responseCreate.data;
-  console.log(req.user);
 
   const userValidationExists = await UserModel.getFindById(req.user.sub);
   if (!userValidationExists.status) {
     return res
-      .status(404)
+      .status(500)
       .json({ error: userValidationExists.err, msg: userValidationExists.msg });
   }
 
-  if (userValidationExists.response.lenght > 0) {
-    return res.status(202).json({ msg: " user already registered " });
-
+  if (userValidationExists.response.length  > 0) {
+    return res.status(400).json({ msg: " user already registered " });
   }
-
+  
   const resultCreateUser = await UserModel.create(
     req.user.sub,
     req.user.email,
@@ -48,7 +46,7 @@ router.post("/user", checkJwt, async (req, res) => {
       .json({ error: resultCreateUser.err, msg: resultCreateUser.msg });
   }
 
-  res.status(200).json({ msg: " user created sucessfully" });
+  res.status(201).json({ msg: " user created sucessfully" });
 });
 
 

@@ -1,19 +1,24 @@
 const knex = require("../database/connection");
 
 class Publication_Model {
-  async getAll() {
+  async getAllPublications() {
     try {
-      await knex.select().table("publication");
-      return { status: true };
+      const publications = await knex.select().table("publication");
+      const publicationsWithUserDetails = await Promise.all(publications.map(async (publication) => {
+        const user = await knex.select().table("user").where({ id: publication.user_id }).first();
+        return { ...publication, user };
+      }));
+      
+      return { status: true, response: publicationsWithUserDetails };
     } catch (error) {
-      return { status: false, err: "error getting all posts"};
-    };
-  };
-
-  async getOne(id) {
+      return { status: false, err: "Failed to retrieve publications" };
+    }
+  }
+  
+  async findById(id) {
     try {
-      await knex.select().where(id).table("publication");
-      return { status: true };
+      const responseGetPubliation = await knex.select().where({id}).table("publication");
+      return { status: true, response: responseGetPubliation};
     } catch (error) {
       return { status: false, err: "error getting publication"};
     };
@@ -37,9 +42,9 @@ class Publication_Model {
     };
   };
 
-  async delete(id) {
+  async destroy(id) {
     try {
-      await knex.delete().where(id).table("publication");
+      await knex.delete().where({id}).table("publication");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error publication"};
