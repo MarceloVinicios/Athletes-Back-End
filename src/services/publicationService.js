@@ -57,7 +57,7 @@ class Publication_Service {
         return {statusCode: 404, response: "Id is not a number"};
       };
 
-      const getPublication = await PublicationModel.getOnePublication(id);
+      const getPublication = await PublicationModel.findById(id);
       if (!getPublication.status) {
         return {statusCode: 500, response: getPublication.err};
       };
@@ -66,7 +66,7 @@ class Publication_Service {
         return {statusCode: 404}
       }
 
-      const deletePublication = await PublicationModel.delete(id);
+      const deletePublication = await PublicationModel.destroy(id);
       if (!deletePublication.status) {
         return {statusCode: 500, response: deletePublication.err}
       }

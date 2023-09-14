@@ -15,9 +15,9 @@ class Publication_Model {
     }
   }
   
-  async getOnePublication(id) {
+  async findById(id) {
     try {
-      const responseGetPubliation = await knex.select().where(id).table("publication");
+      const responseGetPubliation = await knex.select().where({id}).table("publication");
       return { status: true, response: responseGetPubliation};
     } catch (error) {
       return { status: false, err: "error getting publication"};
@@ -42,9 +42,9 @@ class Publication_Model {
     };
   };
 
-  async delete(id) {
+  async destroy(id) {
     try {
-      await knex.delete().where(id).table("publication");
+      await knex.delete().where({id}).table("publication");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error publication"};

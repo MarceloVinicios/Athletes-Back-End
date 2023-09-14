@@ -14,8 +14,8 @@ router.get("/publication", async (req, res) => {
   } catch (error) {
     res.status(500)
       .json({ error: "Error retrieving publications", message: error.message });
-  }
-})
+  };
+});
 
 router.post("/publication", multer(multerConfig).single("file"), async (req, res) => {
   try {
@@ -25,8 +25,8 @@ router.post("/publication", multer(multerConfig).single("file"), async (req, res
 
     if (req.file) {
       const { key,  location: url} = req.file;
-      if (url === undefined) {
-        urlLocal = `${process.env.APP_URL}/files/${key}` 
+      if (!url) {
+        urlLocal = `${process.env.APP_URL}/files/${key}`;
       } else {
         urlLocal = url;
       }
@@ -39,23 +39,23 @@ router.post("/publication", multer(multerConfig).single("file"), async (req, res
   } catch (error) {
     res.status(500)
       .json({ error: "Error saving publication", message: error.message });
-  }
+  };
 });
 
 router.put("/publication/:id", multer(multerConfig).single("file"), async (req, res) => {
   
-})
+});
 
 router.delete("/publication/:id", async (req, res) => {
   try {
-    const responseDeletePublication = await publicationService(req.params.id)
+    const responseDeletePublication = await publicationService.delete(req.params.id);
 
-    res.status(200).json({response: "jujutsu"})
+    res.status(responseDeletePublication.statusCode).json({response: responseDeletePublication.response});
   } catch (error) {
     res.status(500)
       .json({ error: "Error saving publication", message: error.message });
-  }
-})
+  };
+});
 
 
 module.exports = router;
