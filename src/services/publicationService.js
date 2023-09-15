@@ -46,26 +46,25 @@ class Publication_Service {
 
   async update(id, description, url, user_id) {
     try {
-      if (isNaN(id)) {
+      if (isNaN(id) || id <= 0) {
         return {statusCode: 400, response: "Invalid id"};
       };
 
-      if (!description && !url) {
+      if (!description || !url) {
         return {statusCode: 400, response: "description or url not specified"};
       };
 
-      const responsePublicationExists = await PublicationModel.findById(id);
-      if (!responsePublicationExists.status) {
-        return {statusCode: 500, response: responsePublicationExists.err};
+      const [responsePublicationExists, responseUserExists] = await Promise.all([
+        PublicationModel.findById(id),
+        UserModel.getFindById(user_id),
+      ]);
+
+      if (!responsePublicationExists.status || !responseUserExists.status) {
+        return { statusCode: 500, response:  responseUserExists};
       };
 
       if (!responsePublicationExists.response.length) {
         return {statusCode: 404, response: "User not found to edit publication"};
-      }
-
-      const responseUserExists = await UserModel.getFindById(user_id);
-      if (!responseUserExists.status) {
-        return {statusCode: 500, response: responseUserExists.err};
       };
 
       const responseUpdatePublication = await PublicationModel.update(id, description, url);
@@ -82,7 +81,7 @@ class Publication_Service {
   async delete(id) {
     try {
       if (isNaN(id)) {
-        return {statusCode: 404, response: "Id is not a number"};
+        return {statusCode: 404, response: "Invalid id"};
       };
 
       const getPublication = await PublicationModel.findById(id);

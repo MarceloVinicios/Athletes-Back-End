@@ -48,7 +48,7 @@ router.put("/publication/:id?", multer(multerConfig).single("file"), async (req,
     const { description, user_id} = req.body;
 
     if (req.file) {
-      const { key,  location: url} = req.file;
+      const { key,  location: url } = req.file;
       if (!url) {
         urlLocal = `${process.env.APP_URL}/files/${key}`;
       } else {
