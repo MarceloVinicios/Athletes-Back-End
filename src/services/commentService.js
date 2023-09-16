@@ -65,6 +65,9 @@ class Comment_service {
 
 
 
+   } catch(error) {
+      return {statusCode: 500, response: "failed to update comment"}
+
    }
   }
 
