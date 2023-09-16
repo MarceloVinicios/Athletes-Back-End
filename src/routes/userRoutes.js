@@ -3,21 +3,19 @@ const router = express.Router();
 const userService = require("../services/userService");
 const checkJwt = require("../middleware/authToken");
 const UserModel = require("../models/UserModel");
-
+//Guiherme - rota de login.
 router.get("/user/token", checkJwt, async (req, res) => {
   try {
     const accessToken = req.headers.authorization.split(" ")[1];
     const responseCreate = await userService.acessToken(accessToken);
-    req.user = responseCreate.data;
-
-    res.status(200).json({ msg: "Acess token successfully" });
+    
   } catch (error) {
     res
       .status(500)
-      .json({ error: "Error getting token", message: error.message });
+      .json({ });
   }
 });
-
+//Guilherme - rota de postar.
 router.post("/user", checkJwt, async (req, res) => {
   const accessToken = req.headers.authorization.split(" ")[1];
   const responseCreate = await userService.acessToken(accessToken);
@@ -30,10 +28,10 @@ router.post("/user", checkJwt, async (req, res) => {
       .json({ error: userValidationExists.err, msg: userValidationExists.msg });
   }
 
-  if (userValidationExists.response.length  > 0) {
+  if (userValidationExists.response.length > 0) {
     return res.status(400).json({ msg: " user already registered " });
   }
-  
+
   const resultCreateUser = await UserModel.create(
     req.user.sub,
     req.user.email,
@@ -48,35 +46,35 @@ router.post("/user", checkJwt, async (req, res) => {
 
   res.status(201).json({ msg: " user created sucessfully" });
 });
+//Guilherme - rota de atualizar.
+router.put("/user", checkJwt, async (req, res) => {
+  try {
+    const { name, picture } = req.body;
+    const { sub } = req.user;
+    const upatedeUser = await userService.updateUser(sub, name, picture);
 
-router.put("/user", checkJwt, async(req, res)=>{
-  const upatedeUser =  await userService(req.params.id);
-  const updatedUser = req.body;
-  const existingUser = users.find((user) => {
-    return (
-      (user.name === updatedUserData.name ||
-        user.email === updatedUserData.email) &&
-      user.id !== userId
-      
-    );
-    
-  });
-  if (existingUser) {
-    return res.status(400).json({ error: 'Name, ID or email already exist' });
+    res.status(upatedeUser.statusCode).json(upatedeUser.response);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error update publication", message: error.message });
   }
-  const searchUser = userValidationExists.getFindById((user) => user.id===serId);
-})
+});
+//Guilherme - rota de deletar.
+router.delete("/user/:id?", checkJwt, async (req, res) => {
+  try{  
+    const {id} = req.params;
+    const deleteId = await userService.deleteUser(id, name, picture);
+    res.status(deleteId.statusCode).json(deleteId.response);
+  
 
-router.delete("/id", checkJwt, async(req, res)=>{
-  const deleteId = req.body(deleteId);
-  if (searchUser!= res.status(404).json)({ error: 'User not found' });
-   
-   
+  }catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error update publication", message: error.message });
+  }
+  
 
-
-
-})
-
-
+});
 
 module.exports = router;
