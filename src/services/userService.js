@@ -10,15 +10,29 @@ class User_Service {
     });
   }
 
-  async getAll() {}
+
+  async getUser(id) {
+    try {
+      if(!id){
+        return { statusCode: 400, response: "id undefined" };
+      }
+      const searchUser = await UserModel.getFindById(id);
+      if (!searchUser.status) {
+      return { statusCode: 500, response: searchUser.err };
+      }
+      return { statusCode: 200, response: searchUser.response };
+  }
+  catch (error) {
+    return { statusCode: 500, response: "failed to get user" };
+
+  }
+}
 
 
-
-  async getUser() {}
 
   async createUser() {}
 
-  async updateUser(id, name, picture) {
+   async updateUser(id, name, picture) {
     if (!name || !picture) {
       return { statusCode: 400, response: "namme or picture undefined" };
     }
@@ -54,5 +68,6 @@ class User_Service {
 
   }
 }
+
 
 module.exports = new User_Service();

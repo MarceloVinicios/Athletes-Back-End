@@ -4,15 +4,18 @@ const userService = require("../services/userService");
 const checkJwt = require("../middleware/authToken");
 const UserModel = require("../models/UserModel");
 //Guiherme - rota de login.
-router.get("/user/token", checkJwt, async (req, res) => {
+router.get("/user/:id?", checkJwt, async (req, res) => {
   try {
-    const accessToken = req.headers.authorization.split(" ")[1];
-    const responseCreate = await userService.acessToken(accessToken);
+    const { id } = req.params;
+   const getOneUser = await userService.getUser(id);
+   
+    res.status(getOneUser.statusCode).json(getOneUser.response);
+      
     
   } catch (error) {
     res
       .status(500)
-      .json({ });
+      .json({ msg: " failed to get user"});
   }
 });
 //Guilherme - rota de postar.
