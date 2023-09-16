@@ -15,7 +15,7 @@ class User_Model {
       const user = await knex.select().where({id}).table("user");
       return { status: true, response: user };
     } catch (error) {
-      return { status: false, err: "error getting user", msg: error.message };
+      return { status: false, err: "error getting user" };
     };
   };
 
@@ -42,7 +42,7 @@ class User_Model {
       await knex.delete().where(id).table("user");
       return { status: true };
     } catch (error) {
-      return { status: false, err: "error delete user", msg: error.message };
+      return { status: false, err: "error delete user", msg: error.message};
     };
   };
 };
