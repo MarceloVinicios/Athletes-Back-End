@@ -3,8 +3,8 @@ const knex = require("../database/connection");
 class Comment_Model {
   async getAll() {
     try {
-      const GetAllComment = await knex.select().table("comment");
-      return { status: true, response: GetAllComment };
+      await knex.select().table("comment");
+      return { status: true };
     } catch (err) {
       return { status: false, err: "error getting all comment", msg: err.message };
     }
