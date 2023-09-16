@@ -42,8 +42,29 @@ router.post("/publication", multer(multerConfig).single("file"), async (req, res
   };
 });
 
-router.put("/publication/:id", multer(multerConfig).single("file"), async (req, res) => {
-  
+router.put("/publication/:id?", multer(multerConfig).single("file"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { description, user_id} = req.body;
+
+    if (req.file) {
+      const { key,  location: url } = req.file;
+      if (!url) {
+        urlLocal = `${process.env.APP_URL}/files/${key}`;
+      } else {
+        urlLocal = url;
+      };
+    };
+
+    const responseUpdatePublication = await publicationService.update(id, description, urlLocal, user_id);
+    console.log(id, description, urlLocal);
+
+    res.status(responseUpdatePublication.statusCode)
+    .json({ response: responseUpdatePublication.response });
+  } catch (error) {
+    res.status(500)
+    .json({ error: "Error update publication", message: error.message });
+  };
 });
 
 router.delete("/publication/:id", async (req, res) => {
@@ -53,7 +74,7 @@ router.delete("/publication/:id", async (req, res) => {
     res.status(responseDeletePublication.statusCode).json({response: responseDeletePublication.response});
   } catch (error) {
     res.status(500)
-      .json({ error: "Error saving publication", message: error.message });
+      .json({ error: "Error delete publication", message: error.message });
   };
 });
 

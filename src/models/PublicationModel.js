@@ -33,9 +33,9 @@ class Publication_Model {
     };
   };
 
-  async update(name, size, key, url, id) {
+  async update(id, description, url) {
     try {
-      await knex.update({name, size, key, url}).where(id).table("publication");
+      await knex.update({id, description, url}).where({id}).table("publication");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error update publication"};
