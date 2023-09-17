@@ -19,9 +19,18 @@ class Publication_Service {
     };
   };
 
-  async get() {
+  async getOne(id) {
     try {
-      
+      if (isNaN(id)) {
+        return {statusCode: 400, response: "Invalid id"};
+      }
+
+      const getPublicationModel = await PublicationModel.getFindById(id);
+      if (!getPublicationModel.status) {
+        return {statusCode: 500, response: "Failed to get publication"};
+      }
+
+      return {statusCode: 200, response: getPublicationModel.response};
     } catch (error) {
       return {statusCode: 500, error: "Failed to create publication"};
     };
@@ -37,7 +46,7 @@ class Publication_Service {
       if (!createPublication.status) {
         return {statusCode: 500, response: createPublication.err};
       };
-    
+
       return {statusCode: 201, response: "Publication created successfully"};
     } catch (error) {
       return {statusCode: 500, response: error.message};

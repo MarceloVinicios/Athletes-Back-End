@@ -8,19 +8,19 @@ class Publication_Model {
         const user = await knex.select().table("user").where({ id: publication.user_id }).first();
         return { ...publication, user };
       }));
-      
+
       return { status: true, response: publicationsWithUserDetails };
     } catch (error) {
       return { status: false, err: "Failed to retrieve publications" };
     }
   }
-  
+
   async findById(id) {
     try {
       const responseGetPubliation = await knex.select().where({id}).table("publication");
       return { status: true, response: responseGetPubliation};
     } catch (error) {
-      return { status: false, err: "error getting publication"};
+      return { status: false, err: "Error getting publication"};
     };
   };
 
