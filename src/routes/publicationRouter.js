@@ -8,13 +8,26 @@ const publicationService = require("../services/publicationService");
 router.get("/publication", async (req, res) => {
   try {
     const responseGetAllPublication = await publicationService.getAll();
-    
+
     res.status(responseGetAllPublication.statusCode)
       .json({ publicationData: responseGetAllPublication.response });
   } catch (error) {
     res.status(500)
       .json({ error: "Error retrieving publications", message: error.message });
   };
+});
+
+router.get("/publication", async (req, res) => {
+  try {
+    const {id} = req.params;
+    const responseGetIdPublication = await publicationService.get(id);
+
+    res.status(responseGetIdPublication.statusCode)
+      .json({response: responseGetIdPublication.response})
+  } catch (error) {
+      res.status(500)
+        .json({error: "error getting publication", message: error.message})
+  }
 });
 
 router.post("/publication", multer(multerConfig).single("file"), async (req, res) => {
