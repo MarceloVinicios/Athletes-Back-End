@@ -3,10 +3,19 @@ const knex = require("../database/connection");
 class Comment_Model {
   async getAll() {
     try {
-      await knex.select().table("comment");
-      return { status: true };
+      const getAllComment = await knex.select().table("comment");
+      return { status: true, response: getAllComment};
     } catch (err) {
-      return { status: false, err: "error getting all comment", msg: err.message };
+      return { status: false, err: "error getting all comment"};
+    }
+  }
+
+  async findById(id) {
+    try {
+      const getOneComment = await knex.select().where({id}).table("comment");
+      return { status: true, response: getOneComment};
+    } catch (err) {
+      return { status: false, err: "error getting comment"};
     }
   }
 
@@ -15,7 +24,7 @@ class Comment_Model {
       await knex.insert({comment, user_id}).table("comment");
       return { status: true };
     } catch (err) {
-      return { status: false, err: "error saving comment", msg: err.message };
+      return { status: false, err: "error saving comment"};
     }
   }
 
@@ -24,16 +33,16 @@ class Comment_Model {
       await knex.update({comment}).where(id).table("comment");
       return { status: true };
     } catch (err) {
-      return { status: false, err: "error update comment", msg: err.message };
+      return { status: false, err: "error update comment"};
     }
   }
 
   async delete(id) {
     try {
-      await knex.delete().where(id).table("comment");
+      await knex.delete().where({id}).table("comment");
       return { status: true };
     } catch (err) {
-      return { status: false, err: "error delete comment", msg: err.message };
+      return { status: false, err: "error delete comment"};
     }
   }
 }

@@ -10,29 +10,26 @@ class User_Service {
     });
   }
 
-
   async getUser(id) {
     try {
-      if(!id){
+      if (!id) {
         return { statusCode: 400, response: "id undefined" };
       }
       const searchUser = await UserModel.getFindById(id);
       if (!searchUser.status) {
-      return { statusCode: 500, response: searchUser.err };
+        return { statusCode: 500, response: searchUser.err };
       }
       return { statusCode: 200, response: searchUser.response };
+    } catch (error) {
+      return { statusCode: 500, response: "failed to get user" };
+    }
   }
-  catch (error) {
-    return { statusCode: 500, response: "failed to get user" };
 
+  async createUser() {
+    
   }
-}
 
-
-
-  async createUser() {}
-
-   async updateUser(id, name, picture) {
+  async updateUser(id, name, picture) {
     if (!name || !picture) {
       return { statusCode: 400, response: "namme or picture undefined" };
     }
@@ -43,31 +40,27 @@ class User_Service {
     return { statusCode: 200, response: "uptade successfully" };
   }
 
-  async deleteUser(id ) {
+  async deleteUser(id) {
     try {
       const searchUser = await UserModel.getFindById(id);
       if (!searchUser.status) {
-      return { statusCode: 500, response: searchUser.err };
+        return { statusCode: 500, response: searchUser.err };
       }
 
-      if(!searchUser.response.length){
-        return { statusCode: 404, response:"user not found for uptade" };
+      if (!searchUser.response.length) {
+        return { statusCode: 404, response: "user not found for uptade" };
       }
-      
+
       const deleteOneUser = await UserModel.delete(id);
-      if(!deleteOneUser.status) {
+      if (!deleteOneUser.status) {
         return { statusCode: 500, response: deleteOneUser.err };
+      };
 
-      }
-
-      return { statusCode: 200, response: "delete user successfully"};
+      return { statusCode: 200, response: "delete user successfully" };
     } catch (error) {
       return { statusCode: 500, response: "failed to delete user" };
-    
-    }
-
-  }
-}
-
+    };
+  };
+};
 
 module.exports = new User_Service();

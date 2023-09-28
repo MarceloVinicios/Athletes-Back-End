@@ -3,10 +3,10 @@ const knex = require('../database/connection');
 class User_Model {
   async getAll() {
     try {
-      await knex.select().table("user");
-      return { status: true };
+      const getAllUser = await knex.select().table("user");
+      return { status: true, response: getAllUser };
     } catch (error) {
-      return { status: false, error: "error getting all users", msg: error.message };
+      return { status: false, error: "error getting all users"};
     };
   };
 
@@ -15,16 +15,16 @@ class User_Model {
       const user = await knex.select().where({id}).table("user");
       return { status: true, response: user };
     } catch (error) {
-      return { status: false, err: "error getting user", msg: error.message };
+      return { status: false, err: "error getting user" };
     };
   };
 
   async create(id, name, email, picture) {
     try {
-      await knex.insert({id, name, email, picture}).table("user");
+      await knex.insert({id, email, name  , picture}).table("user");
       return { status: true };
     } catch (error) {
-      return { status: false, err: "error saving user", msg: error.message };
+      return { status: false, err: "error saving user" };
     };
   };
 
@@ -33,7 +33,7 @@ class User_Model {
       await knex.update(dataUser).where(id).table("user");
       return { status: true };
     } catch (error) {
-      return { status: false, err: "error when updating user", msg: error.message };
+      return { status: false, err: "error when updating user" };
     };
   };
 
@@ -42,7 +42,7 @@ class User_Model {
       await knex.delete().where(id).table("user");
       return { status: true };
     } catch (error) {
-      return { status: false, err: "error delete user", msg: error.message };
+      return { status: false, err: "error delete user"};
     };
   };
 };

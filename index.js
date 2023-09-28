@@ -6,7 +6,7 @@ const helmet = require("helmet");
 const path = require("path");
 
 app.use(helmet());
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: 'http://localhost:5173' }));
 
 // aplication/json
 app.use(express.json());
@@ -17,6 +17,7 @@ app.use("/files", express.static(path.resolve(__dirname, "src", "uploads")))
 // Routes
 app.use(require("./src/routes/userRoutes"));
 app.use(require("./src/routes/publicationRouter"));
+app.use(require("./src/routes/commentRouter"))
 
 app.listen(4000, () => {
   console.log("Servidor rodando na porta 4000");
