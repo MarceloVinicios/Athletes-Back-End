@@ -2,13 +2,15 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const multerConfig = require("../config/multer");
+const checkJwt = require("../middleware/authToken");
+const getTokenData = require("../utils/getTokenData");
 
 const publicationService = require("../services/publicationService");
 
-router.get("/publication", async (req, res) => {
+router.get("/publication", checkJwt, async (req, res) => {
   try {
     const responseGetAllPublication = await publicationService.getAll();
-
+    
     res.status(responseGetAllPublication.statusCode)
       .json({ publicationData: responseGetAllPublication.response });
   } catch (error) {
@@ -17,27 +19,17 @@ router.get("/publication", async (req, res) => {
   };
 });
 
-router.get("/publication", async (req, res) => {
+router.post("/publication", checkJwt, multer(multerConfig).single("file"), async (req, res) => {
   try {
-    const {id} = req.params;
-    const responseGetIdPublication = await publicationService.get(id);
+    const token = req.headers.authorization.split(" ")[1];
+    const userData = await getTokenData(token);
 
-    res.status(responseGetIdPublication.statusCode)
-      .json({response: responseGetIdPublication.response})
-  } catch (error) {
-      res.status(500)
-        .json({error: "error getting publication", message: error.message})
-  }
-});
-
-router.post("/publication", multer(multerConfig).single("file"), async (req, res) => {
-  try {
     const { description } = req.body;
-    const user_id = 1;
+
     let urlLocal = null;
 
     if (req.file) {
-      const { key,  location: url} = req.file;
+      const { key, location: url } = req.file;
       if (!url) {
         urlLocal = `${process.env.APP_URL}/files/${key}`;
       } else {
@@ -45,15 +37,16 @@ router.post("/publication", multer(multerConfig).single("file"), async (req, res
       }
     }
 
-    const responsePublication = await publicationService.create(description, urlLocal, user_id);
+    const responsePublication = await publicationService.create(description, urlLocal, userData.sub);
 
     res.status(responsePublication.statusCode)
       .json({ response: responsePublication.response });
   } catch (error) {
     res.status(500)
       .json({ error: "Error saving publication", message: error.message });
-  };
+  }
 });
+
 
 router.put("/publication/:id?", multer(multerConfig).single("file"), async (req, res) => {
   try {
@@ -90,6 +83,5 @@ router.delete("/publication/:id", async (req, res) => {
       .json({ error: "Error delete publication", message: error.message });
   };
 });
-
 
 module.exports = router;
