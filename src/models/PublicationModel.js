@@ -3,7 +3,7 @@ const knex = require("../database/connection");
 class Publication_Model {
   async getAllPublications() {
     try {
-      const publications = await knex.select().table("publication");
+      const publications = await knex.select().table("publication").orderBy('id', 'desc'); ;
       const publicationsWithUserDetails = await Promise.all(publications.map(async (publication) => {
         const user = await knex.select().table("user").where({ id: publication.user_id }).first();
         return { ...publication, user };
@@ -24,9 +24,9 @@ class Publication_Model {
     };
   };
 
-  async create(description, url, user_id) {
+  async create(description, url, keyFile, user_id) {
     try {
-      await knex.insert({description, url, user_id}).table("publication");
+      await knex.insert({description, url, key: keyFile, user_id}).table("publication");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error saving publication"};

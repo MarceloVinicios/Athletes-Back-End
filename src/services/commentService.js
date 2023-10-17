@@ -2,9 +2,13 @@ const CommentModel = require("../models/CommentModel");
 const UserModel = require("../models/UserModel");
 
 class Comment_service {
-  async getAllComment() {
+  async getAllComment(publication_id) {
     try {
-      const responseGetAllComment = await CommentModel.getAll();
+      if (isNaN(publication_id) || publication_id <= 0) {
+        return {statusCode: 400, response: "Invalid id"};
+      };
+
+      const responseGetAllComment = await CommentModel.getAll(publication_id);
       if (!responseGetAllComment.status) {
         return {statusCode: 500, response: responseGetAllComment.msg}
       }
@@ -19,17 +23,17 @@ class Comment_service {
     }
   }
 
-  async createComment(comment, user_id) {
+  async createComment(comment, publication_id, user_id) {
     try {
       if (!comment) {
         return { statusCode: 400, response: "Comment is required" };
       }
 
-      if (!user_id) {
-        return { statusCode: 400, response: "User_id is required" };
+      if (!user_id || !publication_id) {
+        return { statusCode: 400, response: "User_id and publication_id is required" };
       }
 
-      const responseCreate = await CommentModel.create(comment, user_id);
+      const responseCreate = await CommentModel.create(comment, publication_id, user_id);
       if (!responseCreate.status){
           return{ statusCode: 500, response: responseCreate.err}
       }

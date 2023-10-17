@@ -20,7 +20,6 @@ router.get("/user/:id?", checkJwt, async (req, res) => {
 });
 
 router.post("/user", checkJwt, async (req, res) => {
-
   const userValidationExists = await UserModel.getFindById(req.user.sub);
   if (!userValidationExists.status) {
     return res

@@ -1,5 +1,7 @@
 const PublicationModel = require("../models/PublicationModel");
 const UserModel = require("../models/UserModel");
+const CommentModel = require("../models/CommentModel");
+const confiS3 = require("../utils/configS3")
 
 class Publication_Service {
   async getAll() {
@@ -29,7 +31,6 @@ class Publication_Service {
 
   async create(description, url, user_id) {
     try {
-      console.log(description, url);
       if (!description) {
         return {statusCode: 400, response: "description or url not specified"};
       } ;
@@ -94,8 +95,20 @@ class Publication_Service {
         return {statusCode: 404};
       };
 
+      if (process.env.STORAGE_TYPE === "s3") {
+        await confiS3().deleteObject({
+          Bucket: process.env.BUCKET_NAME,
+          Key: getPublication.response[0].key,
+        }).promise();
+      }
+
       const deletePublication = await PublicationModel.destroy(id);
       if (!deletePublication.status) {
+        return {statusCode: 500, response: deletePublication.err};
+      };
+
+      const deleteAllComments = await CommentModel.deleteAllCommentsById(id)
+      if (!deleteAllComments.status) {
         return {statusCode: 500, response: deletePublication.err};
       };
 

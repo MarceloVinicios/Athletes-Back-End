@@ -27,9 +27,11 @@ router.post("/publication", checkJwt, multer(multerConfig).single("file"), async
     const { description } = req.body;
 
     let urlLocal = null;
+    let keyFile = null;
 
     if (req.file) {
       const { key, location: url } = req.file;
+      keyFile = key
       if (!url) {
         urlLocal = `${process.env.APP_URL}/files/${key}`;
       } else {
@@ -37,7 +39,7 @@ router.post("/publication", checkJwt, multer(multerConfig).single("file"), async
       }
     }
 
-    const responsePublication = await publicationService.create(description, urlLocal, userData.sub);
+    const responsePublication = await publicationService.create(description, urlLocal, keyFile, userData.sub);
 
     res.status(responsePublication.statusCode)
       .json({ response: responsePublication.response });

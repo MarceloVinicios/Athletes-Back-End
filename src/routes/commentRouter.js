@@ -1,12 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const commentService = require("../services/commentService");
+const checkJwt = require("../middleware/authToken");
+const getTokenData = require("../utils/getTokenData");
 
-router.get("/comment", async (req, res) => {
+router.get("/comment/:publication_id?", checkJwt, async (req, res) => {
   try {
-    const comments = await commentService.getAllComment();
+    const { publication_id } = req.params;
+    const comments = await commentService.getAllComment(publication_id);
 
-    res.status(comments.statusCode).json(comments.response);
+    res.status(comments.statusCode).json({ commentsData: comments.response });
   } catch (error) {
     res
       .status(500)
@@ -14,11 +17,14 @@ router.get("/comment", async (req, res) => {
   }
 });
 
-router.post("/comment", async (req, res) => {
+router.post("/comment", checkJwt, async (req, res) => {
   try {
-    const user_id = "google-oauth2|107984660234185771402"
-    const {comment} = req.body;
-    const newComment = await commentService.createComment(user_id, comment);
+    const token = req.headers.authorization.split(" ")[1];
+    const userData = await getTokenData(token);
+
+    const { comment, publication_id } = req.body;
+    console.log(comment, publication_id);
+    const newComment = await commentService.createComment(comment, publication_id, userData.sub);
 
     res.status(newComment.statusCode).json(newComment.response);
   } catch (error) {
@@ -30,11 +36,13 @@ router.post("/comment", async (req, res) => {
 
 router.put("/comment/:id?", async (req, res) => {
   try {
-    const {id} = req.params;
-    const {comment} = req.body;
-    const updatedComment = await commentService.updateComment(id, comment)
+    const { id } = req.params;
+    const { comment } = req.body;
+    const updatedComment = await commentService.updateComment(id, comment);
 
-    res.status(updatedComment.statusCode).json({response: updatedComment.response});
+    res
+      .status(updatedComment.statusCode)
+      .json({ response: updatedComment.response });
   } catch (error) {
     res
       .status(500)
@@ -44,10 +52,12 @@ router.put("/comment/:id?", async (req, res) => {
 
 router.delete("/comment/:id?", async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const deletedComment = await commentService.deleteUserComment(id);
 
-    res.status(deletedComment.statusCode).json({response: deletedComment.response});
+    res
+      .status(deletedComment.statusCode)
+      .json({ response: deletedComment.response });
   } catch (error) {
     res
       .status(500)
@@ -57,15 +67,18 @@ router.delete("/comment/:id?", async (req, res) => {
 
 router.delete("/comment/:id", async (req, res) => {
   try {
-    const responseDeletePublication = await commentService.delete(req.params.id);
+    const responseDeletePublication = await commentService.delete(
+      req.params.id
+    );
 
-    res.status(responseDeletePublication.status)
-      .json({response: responseDeletePublication.response})
-
+    res
+      .status(responseDeletePublication.status)
+      .json({ response: responseDeletePublication.response });
   } catch (error) {
-      res.status(500)
-        .json({ error: "Error delete publication", message: error.message })
+    res
+      .status(500)
+      .json({ error: "Error delete publication", message: error.message });
   }
-})
+});
 
 module.exports = router;

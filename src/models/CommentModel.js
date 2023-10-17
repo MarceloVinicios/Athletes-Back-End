@@ -1,18 +1,18 @@
 const knex = require("../database/connection");
 
 class Comment_Model {
-  async getAll() {
-    try {
-      const Comments = await knex.select().table("comment");
+  async getAll(publication_id) {
+    try { 
+      const Comments = await knex.select().where({ publication_id: publication_id }).table("comment").orderBy('id', 'desc');  
       const commentsWithUserDetails = await Promise.all(Comments.map(async (comment) => {
-        const user = await knex.select().table("user").where({ id: comment.user_id }).first();
-        return { ...Comments, user };
+        const user = await knex.select().where({ id: comment.user_id }).table("user").first();
+        return { ...comment, user };
       }));
       
-      return { status: true, response: commentsWithUserDetails};
+      return { status: true, response: commentsWithUserDetails };
     } catch (err) {
-      return { status: false, err: "error getting all comment"};
-    }
+      return { status: false, err: err.message };
+    }    
   }
 
   async findById(id) {
@@ -24,9 +24,9 @@ class Comment_Model {
     }
   }
 
-  async create(comment, user_id) {
+  async create(comment, publication_id, user_id) {
     try {
-      await knex.insert({comment, user_id}).table("comment");
+      await knex.insert({comment, publication_id, user_id}).table("comment");
       return { status: true };
     } catch (err) {
       return { status: false, err: "error saving comment"};
@@ -48,6 +48,15 @@ class Comment_Model {
       return { status: true };
     } catch (err) {
       return { status: false, err: "error delete comment"};
+    }
+  }
+
+  async deleteAllCommentsById(publication_id) {
+    try {
+      await knex.delete().where({publication_id}).table("comment");
+      return { status: true };
+    } catch (err) {
+      return { status: false, err: "error delete comments"};
     }
   }
 }
