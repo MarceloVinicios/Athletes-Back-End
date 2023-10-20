@@ -2,48 +2,41 @@ const express = require("express");
 const router = express.Router();
 const userService = require("../services/userService");
 const checkJwt = require("../middleware/authToken");
-const UserModel = require("../models/UserModel");
+const getTokenData = require("../utils/getTokenData");
 
 router.get("/user/:id?", checkJwt, async (req, res) => {
   try {
     const { id } = req.params;
-   const getOneUser = await userService.getUser(id);
-   
+    const getOneUser = await userService.getUser(id);
+
     res.status(getOneUser.statusCode).json(getOneUser.response);
-      
-    
   } catch (error) {
-    res
-      .status(500)
-      .json({ msg: " failed to get user"});
+    res.status(500).json({ msg: " failed to get user" });
   }
 });
 
 router.post("/user", checkJwt, async (req, res) => {
-  const userValidationExists = await UserModel.getFindById(req.user.sub);
-  if (!userValidationExists.status) {
-    return res
-      .status(500)
-      .json({ error: userValidationExists.err, msg: userValidationExists.msg });
-  }
+  try {
+    const { user, address } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const userData = await getTokenData(token);
 
-  if (userValidationExists.response.length > 0) {
-    return res.status(400).json({ msg: " user already registered " });
-  }
+    const createUser = await userService.createUser(
+      userData.sub,
+      userData.email,
+      user.name,
+      user.picture,
+      user.goal,
+      user.category_id,
+      address.city,
+      address.state,
+      address.country
+    );
 
-  const resultCreateUser = await UserModel.create(
-    req.user.sub,
-    req.user.email,
-    req.user.name,
-    req.user.picture
-  );
-  if (!resultCreateUser.status) {
-    return res
-      .status(404)
-      .json({ error: resultCreateUser.err, msg: resultCreateUser.msg });
+    res.status(createUser.statusCode).json(createUser.response);
+  } catch (err) {
+    res.status(500).json({ msg: "Error creating user" });
   }
-
-  res.status(201).json({ msg: " user created sucessfully" });
 });
 
 router.put("/user", checkJwt, async (req, res) => {
@@ -61,11 +54,11 @@ router.put("/user", checkJwt, async (req, res) => {
 });
 
 router.delete("/user/:id?", checkJwt, async (req, res) => {
-  try{  
-    const {id} = req.params;
+  try {
+    const { id } = req.params;
     const deleteId = await userService.deleteUser(id, name, picture);
     res.status(deleteId.statusCode).json(deleteId.response);
-  }catch (error) {
+  } catch (error) {
     res
       .status(500)
       .json({ error: "Error update publication", message: error.message });

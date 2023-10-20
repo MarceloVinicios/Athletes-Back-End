@@ -29,13 +29,13 @@ class Publication_Service {
     };
   };
 
-  async create(description, url, user_id) {
+  async create(description, url, keyFile, user_id) {
     try {
       if (!description) {
         return {statusCode: 400, response: "description or url not specified"};
       } ;
 
-      const createPublication = await PublicationModel.create(description, url, user_id);
+      const createPublication = await PublicationModel.create(description, url, keyFile, user_id);
       if (!createPublication.status) {
         return {statusCode: 500, response: createPublication.err};
       };

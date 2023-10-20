@@ -19,14 +19,29 @@ class User_Model {
     };
   };
 
-  async create(id, name, email, picture) {
+  async getFindByEmail(email) {
     try {
-      await knex.insert({id, email, name  , picture}).table("user");
-      return { status: true };
+      const user = await knex.select().where({email}).table("user");
+      return { status: true, response: user[0] };
     } catch (error) {
-      return { status: false, err: "error saving user" };
+      return { status: false, err: "error getting user" };
     };
   };
+
+  async create(id, email, name, picture, goal, category_id, city, state, country) {
+    const transaction = await knex.transaction();
+
+    try {
+      await transaction.insert({ id, email, name, picture, goal, category_id }).table('user');
+      await transaction.insert({ city, state, country, user_id: id }).table('address');
+      await transaction.commit();
+
+      return { status: true };
+    } catch (error) {
+      await transaction.rollback();
+      return { status: false, err: error };
+    }
+  }
 
   async update(dataUser, id) {
     try {

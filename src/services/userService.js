@@ -1,15 +1,8 @@
 const axios = require("axios");
 const UserModel = require("../models/UserModel");
+const validationParams = require("../utils/validationParams");
 
 class User_Service {
-  async acessToken(token) {
-    return axios.get("https://dev-v6oinruanic8adgg.us.auth0.com/userinfo", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  }
-
   async getUser(id) {
     try {
       if (!id) {
@@ -25,8 +18,31 @@ class User_Service {
     }
   }
 
-  async createUser() {
-    
+  async createUser(sub, email, name, picture, goal, category_id, city, state, country) {
+    try {
+      const validationResponse = validationParams.createAndUpdateUser(sub, email, name, picture, goal, category_id, city, state, country);
+      if (validationResponse) {
+        return { statusCode: 400, response: validationResponse };
+      }
+
+      const userExist = await UserModel.getFindByEmail(email);
+      if (!userExist.status) {
+        return {statusCode: 500, response: userExist.err}
+      }
+
+      if (userExist.response) {
+        return {statusCode: 409, response: "The user already exists"}
+      }
+
+      const resultCreateUser = await UserModel.create(sub, email, name, picture, goal, category_id, city, state, country);
+      if (!resultCreateUser.status) {
+        return { statusCode: 500, response: resultCreateUser.err };
+      }
+
+      return { statusCode: 201, response: "User created" };
+    } catch (err) {
+      return { statusCode: 500, response: err.message };
+    }
   }
 
   async updateUser(id, name, picture) {
@@ -54,13 +70,13 @@ class User_Service {
       const deleteOneUser = await UserModel.delete(id);
       if (!deleteOneUser.status) {
         return { statusCode: 500, response: deleteOneUser.err };
-      };
+      }
 
       return { statusCode: 200, response: "delete user successfully" };
     } catch (error) {
       return { statusCode: 500, response: "failed to delete user" };
-    };
-  };
-};
+    }
+  }
+}
 
 module.exports = new User_Service();
