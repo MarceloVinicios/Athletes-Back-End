@@ -8,10 +8,16 @@ class User_Service {
       if (!id) {
         return { statusCode: 400, response: "id undefined" };
       }
+
       const searchUser = await UserModel.getFindById(id);
       if (!searchUser.status) {
         return { statusCode: 500, response: searchUser.err };
       }
+
+      if (!searchUser.response[0]) {
+        return { statusCode: 404, response: "User not found" };
+      }
+
       return { statusCode: 200, response: searchUser.response };
     } catch (error) {
       return { statusCode: 500, response: "failed to get user" };

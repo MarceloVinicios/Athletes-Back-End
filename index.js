@@ -4,11 +4,13 @@ const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const path = require("path");
+const bodyParser = require('body-parser');
 
 app.use(helmet());
 app.use(cors({ origin: 'http://localhost:5173' }));
 
 // aplication/json
+app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(morgan("dev"));

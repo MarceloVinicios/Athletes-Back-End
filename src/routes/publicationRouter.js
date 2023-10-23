@@ -10,7 +10,7 @@ const publicationService = require("../services/publicationService");
 router.get("/publication", checkJwt, async (req, res) => {
   try {
     const responseGetAllPublication = await publicationService.getAll();
-    
+
     res.status(responseGetAllPublication.statusCode)
       .json({ publicationData: responseGetAllPublication.response });
   } catch (error) {
