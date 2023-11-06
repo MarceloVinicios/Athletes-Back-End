@@ -49,7 +49,6 @@ router.post("/publication", checkJwt, multer(multerConfig).single("file"), async
   }
 });
 
-
 router.put("/publication/:id?", multer(multerConfig).single("file"), async (req, res) => {
   try {
     const { id } = req.params;
@@ -65,7 +64,6 @@ router.put("/publication/:id?", multer(multerConfig).single("file"), async (req,
     };
 
     const responseUpdatePublication = await publicationService.update(id, description, urlLocal, user_id);
-    console.log(id, description, urlLocal);
 
     res.status(responseUpdatePublication.statusCode)
     .json({ response: responseUpdatePublication.response });
@@ -75,9 +73,13 @@ router.put("/publication/:id?", multer(multerConfig).single("file"), async (req,
   };
 });
 
-router.delete("/publication/:id", async (req, res) => {
+router.delete("/publication/:id?", checkJwt, async (req, res) => {
   try {
-    const responseDeletePublication = await publicationService.delete(req.params.id);
+    const {id} = req.params;
+    const token = req.headers.authorization.split(" ")[1];
+    const userData = await getTokenData(token);
+
+    const responseDeletePublication = await publicationService.delete(id, userData.sub);
 
     res.status(responseDeletePublication.statusCode).json({response: responseDeletePublication.response});
   } catch (error) {

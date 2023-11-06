@@ -6,6 +6,16 @@ const getTokenData = require("../utils/getTokenData");
 const multer = require("multer");
 const multerConfig = require("../config/multer");
 
+router.get("/users", checkJwt, async (req, res) => {
+  try {
+    const getAllUsers = await userService.getAllUsers();
+
+    res.status(getAllUsers.statusCode).json({response: getAllUsers.response})
+  } catch (err) {
+    res.status(500).json({ msg: " failed to get all users" });
+  }
+})
+
 router.get("/user", checkJwt, async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -16,6 +26,7 @@ router.get("/user", checkJwt, async (req, res) => {
       .status(getOneUser.statusCode)
       .json({ response: getOneUser.response[0] });
   } catch (error) {
+    console.log(error.message)
     res.status(500).json({ msg: " failed to get user" });
   }
 });
@@ -28,8 +39,6 @@ router.post("/user", checkJwt, multer(multerConfig).single("picture"), async (re
       let urlLocal = null;
       let keyFile = null;
 
-      console.log(req.file)
-      console.log(name, goal, category_id, city, state, country)
       if (req.file) {
         const { key, location: url } = req.file;
         keyFile = key;
@@ -79,6 +88,7 @@ router.delete("/user/:id?", checkJwt, async (req, res) => {
     const deleteId = await userService.deleteUser(id, name, picture);
     res.status(deleteId.statusCode).json(deleteId.response);
   } catch (error) {
+    console.log(error)
     res
       .status(500)
       .json({ error: "Error update publication", message: error.message });

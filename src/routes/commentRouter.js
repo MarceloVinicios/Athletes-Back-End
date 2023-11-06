@@ -23,8 +23,11 @@ router.post("/comment", checkJwt, async (req, res) => {
     const userData = await getTokenData(token);
 
     const { comment, publication_id } = req.body;
-    console.log(comment, publication_id);
-    const newComment = await commentService.createComment(comment, publication_id, userData.sub);
+    const newComment = await commentService.createComment(
+      comment,
+      publication_id,
+      userData.sub
+    );
 
     res.status(newComment.statusCode).json(newComment.response);
   } catch (error) {
@@ -50,10 +53,13 @@ router.put("/comment/:id?", async (req, res) => {
   }
 });
 
-router.delete("/comment/:id?", async (req, res) => {
+router.delete("/comment/:id?", checkJwt, async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedComment = await commentService.deleteUserComment(id);
+    const token = req.headers.authorization.split(" ")[1];
+    const userData = await getTokenData(token);
+
+    const deletedComment = await commentService.deleteUserComment(id, userData.sub);
 
     res
       .status(deletedComment.statusCode)
@@ -62,22 +68,6 @@ router.delete("/comment/:id?", async (req, res) => {
     res
       .status(500)
       .json({ error: "Error delete comment", message: error.message });
-  }
-});
-
-router.delete("/comment/:id", async (req, res) => {
-  try {
-    const responseDeletePublication = await commentService.delete(
-      req.params.id
-    );
-
-    res
-      .status(responseDeletePublication.status)
-      .json({ response: responseDeletePublication.response });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error delete publication", message: error.message });
   }
 });
 

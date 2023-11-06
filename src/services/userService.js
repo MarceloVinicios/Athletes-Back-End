@@ -3,6 +3,23 @@ const UserModel = require("../models/UserModel");
 const validationParams = require("../utils/validationParams");
 
 class User_Service {
+  async getAllUsers() {
+    try {
+      const responseGetAllUsers = await UserModel.getAllUsers();
+      if (!responseGetAllUsers.status) {
+        return { statusCode: 500, response: responseGetAllUsers.err };
+      }
+
+      if (!responseGetAllUsers.response.length) {
+        return {statusCode: 204};
+      };
+
+      return {statusCode: 200, response: responseGetAllUsers.response}
+    } catch (err) {
+      return { statusCode: 500, response: "failed to get all users" };
+    }
+  }
+
   async getUser(id) {
     try {
       if (!id) {

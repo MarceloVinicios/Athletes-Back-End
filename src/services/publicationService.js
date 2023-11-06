@@ -23,7 +23,7 @@ class Publication_Service {
 
   async get() {
     try {
-      
+
     } catch (error) {
       return {statusCode: 500, error: "Failed to create publication"};
     };
@@ -39,7 +39,7 @@ class Publication_Service {
       if (!createPublication.status) {
         return {statusCode: 500, response: createPublication.err};
       };
-    
+
       return {statusCode: 201, response: "Publication created successfully"};
     } catch (error) {
       return {statusCode: 500, response: error.message};
@@ -48,7 +48,7 @@ class Publication_Service {
 
   async update(id, description, url, user_id) {
     try {
-      if (isNaN(id) || id <= 0) {
+      if (!isNaN(id) || id <= 0) {
         return {statusCode: 400, response: "Invalid id"};
       };
 
@@ -80,10 +80,10 @@ class Publication_Service {
     };
   };
 
-  async delete(id) {
+  async delete(id, user_id) {
     try {
       if (isNaN(id)) {
-        return {statusCode: 404, response: "Invalid id"};
+        return {statusCode: 400, response: "Invalid id"};
       };
 
       const getPublication = await PublicationModel.findById(id);
@@ -95,11 +95,8 @@ class Publication_Service {
         return {statusCode: 404};
       };
 
-      if (process.env.STORAGE_TYPE === "s3") {
-        await confiS3().deleteObject({
-          Bucket: process.env.BUCKET_NAME,
-          Key: getPublication.response[0].key,
-        }).promise();
+      if(getPublication.response[0].user_id != user_id) {
+        return {statusCode: 403, response:"You do not have permission to delete this publication."}
       }
 
       const deletePublication = await PublicationModel.destroy(id);
@@ -107,10 +104,12 @@ class Publication_Service {
         return {statusCode: 500, response: deletePublication.err};
       };
 
-      const deleteAllComments = await CommentModel.deleteAllCommentsById(id)
-      if (!deleteAllComments.status) {
-        return {statusCode: 500, response: deletePublication.err};
-      };
+      if (process.env.STORAGE_TYPE === "s3") {
+        await confiS3().deleteObject({
+          Bucket: process.env.BUCKET_NAME,
+          Key: getPublication.response[0].key,
+        }).promise();
+      }
 
       return {statusCode: 200, response: "Publication deleted successfully"};
     } catch (error) {

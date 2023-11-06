@@ -3,21 +3,21 @@ const knex = require("../database/connection");
 class Publication_Model {
   async getAllPublications() {
     try {
-      const publications = await knex.select().table("publication").orderBy('id', 'desc'); ;
+      const publications = await knex.select().table("publications").orderBy('id', 'desc'); ;
       const publicationsWithUserDetails = await Promise.all(publications.map(async (publication) => {
-        const user = await knex.select().table("user").where({ id: publication.user_id }).first();
+        const user = await knex.select().table("users").where({ id: publication.user_id }).first();
         return { ...publication, user };
       }));
-      
+
       return { status: true, response: publicationsWithUserDetails };
     } catch (error) {
       return { status: false, err: "Failed to retrieve publications" };
     }
   }
-  
+
   async findById(id) {
     try {
-      const responseGetPubliation = await knex.select().where({id}).table("publication");
+      const responseGetPubliation = await knex.select().where({id}).table("publications");
       return { status: true, response: responseGetPubliation};
     } catch (error) {
       return { status: false, err: "error getting publication"};
@@ -26,7 +26,7 @@ class Publication_Model {
 
   async create(description, url, keyFile, user_id) {
     try {
-      await knex.insert({description, url, key: keyFile, user_id}).table("publication");
+      await knex.insert({description, url, key: keyFile, user_id}).table("publications");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error saving publication"};
@@ -35,7 +35,7 @@ class Publication_Model {
 
   async update(id, description, url) {
     try {
-      await knex.update({id, description, url}).where({id}).table("publication");
+      await knex.update({id, description, url}).where({id}).table("publications");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error update publication"};
@@ -44,7 +44,7 @@ class Publication_Model {
 
   async destroy(id) {
     try {
-      await knex.delete().where({id}).table("publication");
+      await knex.delete().where({id}).table("publications");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error publication"};
