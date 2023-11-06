@@ -3,15 +3,38 @@ const UserModel = require("../models/UserModel");
 const validationParams = require("../utils/validationParams");
 
 class User_Service {
+  async getAllUsers() {
+    try {
+      const responseGetAllUsers = await UserModel.getAllUsers();
+      if (!responseGetAllUsers.status) {
+        return { statusCode: 500, response: responseGetAllUsers.err };
+      }
+
+      if (!responseGetAllUsers.response.length) {
+        return {statusCode: 204};
+      };
+
+      return {statusCode: 200, response: responseGetAllUsers.response}
+    } catch (err) {
+      return { statusCode: 500, response: "failed to get all users" };
+    }
+  }
+
   async getUser(id) {
     try {
       if (!id) {
         return { statusCode: 400, response: "id undefined" };
       }
+
       const searchUser = await UserModel.getFindById(id);
       if (!searchUser.status) {
         return { statusCode: 500, response: searchUser.err };
       }
+
+      if (!searchUser.response[0]) {
+        return { statusCode: 404, response: "User not found" };
+      }
+
       return { statusCode: 200, response: searchUser.response };
     } catch (error) {
       return { statusCode: 500, response: "failed to get user" };

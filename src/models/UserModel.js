@@ -1,9 +1,9 @@
 const knex = require('../database/connection');
 
 class User_Model {
-  async getAll() {
+  async getAllUsers() {
     try {
-      const getAllUser = await knex.select().table("user");
+      const getAllUser = await knex.select().table("users");
       return { status: true, response: getAllUser };
     } catch (error) {
       return { status: false, error: "error getting all users"};
@@ -12,7 +12,7 @@ class User_Model {
 
   async getFindById(id) {
     try {
-      const user = await knex.select().where({id}).table("user");
+      const user = await knex.select().where({id}).table("users");
       return { status: true, response: user };
     } catch (error) {
       return { status: false, err: "error getting user" };
@@ -21,7 +21,7 @@ class User_Model {
 
   async getFindByEmail(email) {
     try {
-      const user = await knex.select().where({email}).table("user");
+      const user = await knex.select().where({email}).table("users");
       return { status: true, response: user[0] };
     } catch (error) {
       return { status: false, err: "error getting user" };
@@ -32,7 +32,7 @@ class User_Model {
     const transaction = await knex.transaction();
 
     try {
-      await transaction.insert({ id, email, name, picture, goal, category_id }).table('user');
+      await transaction.insert({ id, email, name, picture, goal, category_id }).table('users');
       await transaction.insert({ city, state, country, user_id: id }).table('address');
       await transaction.commit();
 
@@ -45,7 +45,7 @@ class User_Model {
 
   async update(dataUser, id) {
     try {
-      await knex.update(dataUser).where(id).table("user");
+      await knex.update(dataUser).where(id).table("users");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error when updating user" };
@@ -54,7 +54,7 @@ class User_Model {
 
   async delete(id) {
     try {
-      await knex.delete().where(id).table("user");
+      await knex.delete().where(id).table("users");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error delete user"};
