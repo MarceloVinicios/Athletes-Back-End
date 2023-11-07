@@ -26,8 +26,7 @@ router.get("/user", checkJwt, async (req, res) => {
       .status(getOneUser.statusCode)
       .json({ response: getOneUser.response[0] });
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({ msg: " failed to get user" });
+    res.status(500).json({ msg: error.message });
   }
 });
 
@@ -48,6 +47,16 @@ router.post("/user", checkJwt, multer(multerConfig).single("picture"), async (re
           urlLocal = url;
         }
       }
+
+      console.log(        userData.sub,
+        userData.email,
+        name,
+        urlLocal,
+        goal,
+        category_id,
+        city,
+        state,
+        country)
 
       const createUser = await userService.createUser(
         userData.sub,
