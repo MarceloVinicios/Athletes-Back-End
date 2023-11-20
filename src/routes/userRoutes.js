@@ -48,16 +48,6 @@ router.post("/user", checkJwt, multer(multerConfig).single("picture"), async (re
         }
       }
 
-      console.log(        userData.sub,
-        userData.email,
-        name,
-        urlLocal,
-        goal,
-        category_id,
-        city,
-        state,
-        country)
-
       const createUser = await userService.createUser(
         userData.sub,
         userData.email,
