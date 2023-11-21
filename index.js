@@ -15,11 +15,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use("/files", express.static(path.resolve(__dirname, "src", "uploads")));
 
-app.use(require("./src/routes/categoryRouter"))
-app.use(require("./src/routes/likesRouter"))
-app.use(require("./src/routes/commentRouter"))
-app.use(require("./src/routes/publicationRouter"))
-app.use(require("./src/routes/userRoutes"))
+app.use(require("./src/routes/categoryRouter"));
+app.use(require("./src/routes/likesRouter"));
+app.use(require("./src/routes/commentRouter"));
+app.use(require("./src/routes/publicationRouter"));
+app.use(require("./src/routes/userRoutes"));
 
 const server = http.createServer(app);
 configureSocketIO(server);

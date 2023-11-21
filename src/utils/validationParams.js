@@ -1,5 +1,15 @@
 class ValidationParams {
-  createAndUpdateUser(sub, email, name, picture, goal, category_id, city, state, country) {
+  createAndUpdateUser(
+    sub,
+    email,
+    name,
+    picture,
+    goal,
+    category_id,
+    city,
+    state,
+    country
+  ) {
     const invalidFields = {};
     const parameters = [
       { param: sub, paramName: "sub" },
