@@ -19,13 +19,25 @@ router.get("/publication", checkJwt, async (req, res) => {
   };
 });
 
+router.get("/publication/:category", async (req, res) => {
+  try {
+    const {category} = req.params;
+    const responseGetAllPublicationsByCategory = await publicationService.getByCategory(category);
+
+    res.status(responseGetAllPublicationsByCategory.statusCode)
+      .json({ publicationData: responseGetAllPublicationsByCategory.response });
+  } catch (error) {
+    res.status(500).json({error: "Error getting publication by category", message: error.message});
+  };
+});
+
 router.post("/publication", checkJwt, multer(multerConfig).single("file"), async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
     const userData = await getTokenData(token);
-    console.log(userData);  
 
-    const { description } = req.body;
+    const { description, category } = req.body;
+    console.log(category);
 
     let urlLocal = null;
     let keyFile = null;
@@ -40,7 +52,7 @@ router.post("/publication", checkJwt, multer(multerConfig).single("file"), async
       }
     }
 
-    const responsePublication = await publicationService.create(description, urlLocal, keyFile, userData.sub);
+    const responsePublication = await publicationService.create(description, urlLocal, keyFile, userData.sub, category);
 
     res.status(responsePublication.statusCode)
       .json({ response: responsePublication.response });

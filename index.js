@@ -6,6 +6,14 @@ const morgan = require("morgan");
 const helmet = require("helmet");
 const path = require("path");
 const configureSocketIO = require("./src/socket/socket");
+const rateLimit = require("express-rate-limit");
+
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 100,
+});
+
+app.use(limiter);
 
 app.use(helmet());
 app.use(cors({ origin: "http://localhost:5173" }));

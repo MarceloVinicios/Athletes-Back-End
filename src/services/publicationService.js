@@ -1,6 +1,6 @@
 const PublicationModel = require("../models/PublicationModel");
+const CategoryModel = require("../models/CategoryModel");
 const UserModel = require("../models/UserModel");
-const CommentModel = require("../models/CommentModel");
 const confiS3 = require("../utils/configS3")
 
 class Publication_Service {
@@ -21,21 +21,47 @@ class Publication_Service {
     };
   };
 
-  async get() {
+  async getByCategory(category) {
     try {
+      if (!category) {
+        return {statusCode: 400, response: "Category invalid"};
+      };
 
+      const responseExistCategory = await CategoryModel.getByCategory(category);
+      if (!responseExistCategory.status) {
+        return {statusCode: 500, response: "Error getting category"};
+      };
+
+      if (!responseExistCategory.response.length) {
+        return {statusCode: 404, response: "Category not found"};
+      };
+
+      const getAllPublicationsByCategory = await PublicationModel.findAByCategory(category);
+      if (!getAllPublicationsByCategory.status) {
+        return {statusCode: 500, response: "Error getting publications by category"};
+      };
+
+      if (!getAllPublicationsByCategory.response.length) {
+        return {statusCode: 204, response: "Publications not found"};
+      };
+
+      return {statusCode: 200, response: getAllPublicationsByCategory.response};
     } catch (error) {
-      return {statusCode: 500, error: "Failed to create publication"};
+      return {statusCode: 500, error: "Failed to get one publication"};
     };
   };
 
-  async create(description, url, keyFile, user_id) {
+  async create(description, url, keyFile, user_id, category) {
     try {
       if (!description) {
         return {statusCode: 400, response: "description or url not specified"};
       } ;
 
-      const createPublication = await PublicationModel.create(description, url, keyFile, user_id);
+      if (!category) {
+        return {statusCode: 400, response: "Category not specified"};
+      } ;
+
+      const createPublication = await PublicationModel.create(description, url, keyFile, user_id, category);
       if (!createPublication.status) {
         return {statusCode: 500, response: createPublication.err};
       };

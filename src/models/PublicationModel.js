@@ -24,9 +24,18 @@ class Publication_Model {
     };
   };
 
-  async create(description, url, keyFile, user_id) {
+  async findAByCategory(category) {
     try {
-      await knex.insert({description, url, key: keyFile, user_id}).table("publications");
+      const responseGetAllPublicationsByCategory = await knex.select().where({category_id: category}).table("publications");
+      return { status: true, response: responseGetAllPublicationsByCategory};
+    } catch (error) {
+      return { status: false, err: error.message};
+    }
+  }
+
+  async create(description, url, keyFile, user_id, category) {
+    try {
+      await knex.insert({description, url, key: keyFile, user_id, category_id: category}).table("publications");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error saving publication"};
