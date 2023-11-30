@@ -3,12 +3,18 @@ const knex = require("../database/connection");
 class Publication_Model {
   async getAllPublications() {
     try {
-      const publications = await knex.select().table("publications").orderBy('id', 'desc'); ;
+      const publications = await knex.select().table("publications").orderBy('id', 'desc');
       const publicationsWithUserDetails = await Promise.all(publications.map(async (publication) => {
-        const user = await knex.select().table("users").where({ id: publication.user_id }).first();
-        return { ...publication, user };
+          const user = await knex.select().table("users").where({ id: publication.user_id }).first();
+          const likes = await knex.select().table("likes").where({ publication_id: publication.id });
+      
+          return { 
+              ...publication,
+              user,
+              likes: likes || []
+          };
       }));
-
+      
       return { status: true, response: publicationsWithUserDetails };
     } catch (error) {
       return { status: false, err: "Failed to retrieve publications" };
@@ -26,12 +32,25 @@ class Publication_Model {
 
   async findAByCategory(category) {
     try {
-      const responseGetAllPublicationsByCategory = await knex.select().where({category_id: category}).table("publications");
-      return { status: true, response: responseGetAllPublicationsByCategory};
+        const publications = await knex.select().where({ category_id: category }).table("publications");
+
+        const publicationsWithUserAndLikes = await Promise.all(publications.map(async (publication) => {
+            const user = await knex.select().table("users").where({ id: publication.user_id }).first();
+            const likes = await knex.select().table("likes").where({ publication_id: publication.id });
+            
+            return {
+                ...publication,
+                user,
+                likes: likes || []
+            };
+        }));
+
+        return { status: true, response: publicationsWithUserAndLikes };
     } catch (error) {
-      return { status: false, err: error.message};
+        return { status: false, err: error.message };
     }
-  }
+}
+
 
   async create(description, url, keyFile, user_id, category) {
     try {
