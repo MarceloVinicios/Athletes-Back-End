@@ -21,6 +21,24 @@ class Publication_Service {
     };
   };
 
+  async getPublication(id) {
+    if (isNaN(id)) {
+      return { statusCode: 400, response: "Invalid id" };
+    }
+  
+    const responseGetPublication = await PublicationModel.findByIdPublication(id);
+    
+    if (!responseGetPublication.status) {
+      return { statusCode: 500, response: responseGetPublication.err };
+    }
+  
+    if (responseGetPublication.notFound) {
+      return { statusCode: 204};
+    }
+  
+    return { statusCode: 200, response: responseGetPublication.response };
+  }
+
   async getByCategory(category) {
     try {
       if (!category) {

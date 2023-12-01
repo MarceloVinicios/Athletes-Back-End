@@ -19,7 +19,20 @@ router.get("/publication", checkJwt, async (req, res) => {
   };
 });
 
-router.get("/publication/:category", async (req, res) => {
+router.get("/publication/:id", async(req, res) => {
+  try {
+    const {id} = req.params;
+    const responseGetPublication = await publicationService.getPublication(id);
+
+    res.status(responseGetPublication.statusCode)
+     .json({ publicationData: responseGetPublication.response });
+  } catch (err) {
+    res.status(500)
+     .json({ error: "Error retrieving a publication", message: err.message });
+  };
+});
+
+router.get("/publication/category/:category", checkJwt, async (req, res) => {
   try {
     const {category} = req.params;
     const responseGetAllPublicationsByCategory = await publicationService.getByCategory(category);

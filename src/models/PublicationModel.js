@@ -30,18 +30,44 @@ class Publication_Model {
     };
   };
 
+  async findByIdPublication(id) {
+    try {
+      const publications = await knex.select().where({ id }).table("publications");
+      const publication = publications[0];
+
+      if (!publication) {
+        return { status: true, notFound: true, err: "Publication not found" };
+      }
+      
+      const userPromise = knex.select().table("users").where({ id: publication.user_id }).first();
+      const likesPromise = knex.select().table("likes").where({ publication_id: publication.id });
+  
+      const [user, likes] = await Promise.all([userPromise, likesPromise]);
+  
+      const publicationWithDetails = {
+        ...publication,
+        user,
+        likes: likes || []
+      };
+  
+      return { status: true, response: publicationWithDetails };
+    } catch (error) {
+      return { status: false, err: error.message };
+    }
+  }
+
   async findAByCategory(category) {
     try {
-        const publications = await knex.select().where({ category_id: category }).table("publications");
+      const publications = await knex.select().where({ category_id: category }).table("publications");
 
-        const publicationsWithUserAndLikes = await Promise.all(publications.map(async (publication) => {
-            const user = await knex.select().table("users").where({ id: publication.user_id }).first();
-            const likes = await knex.select().table("likes").where({ publication_id: publication.id });
+      const publicationsWithUserAndLikes = await Promise.all(publications.map(async (publication) => {
+          const user = await knex.select().table("users").where({ id: publication.user_id }).first();
+          const likes = await knex.select().table("likes").where({ publication_id: publication.id });
             
-            return {
-                ...publication,
-                user,
-                likes: likes || []
+          return {
+              ...publication,
+              user,
+              likes: likes || []
             };
         }));
 
@@ -49,12 +75,12 @@ class Publication_Model {
     } catch (error) {
         return { status: false, err: error.message };
     }
-}
+  }
 
 
   async create(description, url, keyFile, user_id, category) {
     try {
-      await knex.insert({description, url, key: keyFile, user_id, category_id: category}).table("publications");
+      await knex.insert({description, url, key: keyFile, publication_at: knex.fn.now(), user_id, category_id: category}).table("publications");
       return { status: true };
     } catch (error) {
       return { status: false, err: "error saving publication"};
