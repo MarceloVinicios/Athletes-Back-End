@@ -52,7 +52,7 @@ class Publication_Model {
   
       return { status: true, response: publicationWithDetails };
     } catch (error) {
-      return { status: false, err: error.message };
+      return { status: false, err: "Error in getting publication by id" };
     }
   }
 
@@ -76,7 +76,6 @@ class Publication_Model {
         return { status: false, err: error.message };
     }
   }
-
 
   async create(description, url, keyFile, user_id, category) {
     try {

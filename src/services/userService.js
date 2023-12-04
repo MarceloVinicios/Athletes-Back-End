@@ -22,7 +22,7 @@ class User_Service {
 
   async getUser(id) {
     try {
-      if (!id) {
+      if (!id || !isNaN(id)) {
         return { statusCode: 400, response: "id undefined" };
       }
 
@@ -35,7 +35,7 @@ class User_Service {
         return { statusCode: 404, response: "User not found" };
       }
 
-      return { statusCode: 200, response: searchUser.response };
+      return { statusCode: 200, response: searchUser.response[0] };
     } catch (error) {
       return { statusCode: 500, response: "failed to get user" };
     }

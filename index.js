@@ -6,14 +6,9 @@ const morgan = require("morgan");
 const helmet = require("helmet");
 const path = require("path");
 const configureSocketIO = require("./src/socket/socket");
-const rateLimit = require("express-rate-limit");
+const bodyParser = require('body-parser');
 
-const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
-  max: 100,
-});
-
-app.use(limiter);
+app.use(bodyParser.json());
 
 app.use(helmet());
 app.use(cors({ origin: "http://localhost:5173" }));
@@ -27,6 +22,7 @@ app.use(require("./src/routes/categoryRouter"));
 app.use(require("./src/routes/likesRouter"));
 app.use(require("./src/routes/commentRouter"));
 app.use(require("./src/routes/publicationRouter"));
+app.use(require("./src/routes/connectionRouter"))
 app.use(require("./src/routes/userRoutes"));
 
 const server = http.createServer(app);

@@ -24,11 +24,25 @@ router.get("/user", checkJwt, async (req, res) => {
 
     res
       .status(getOneUser.statusCode)
-      .json({ response: getOneUser.response[0] });
+      .json({ response: getOneUser.response });
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
 });
+
+router.get("/user/:id", checkJwt, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const getOneUser = await userService.getUser(id);
+
+    res
+      .status(getOneUser.statusCode)
+      .json({ response: getOneUser.response});
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
 
 router.post("/user", checkJwt, multer(multerConfig).single("picture"), async (req, res) => {
     try {

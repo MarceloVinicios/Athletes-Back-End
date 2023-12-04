@@ -18,7 +18,7 @@ router.post("/like/:publication_id?", checkJwt, async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ error: "Error like", message: error.message });
+      .json({ error: "Error saving like", message: error.message });
   };
 });
 
