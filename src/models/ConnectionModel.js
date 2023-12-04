@@ -26,18 +26,14 @@ class Connection_Model {
       const myConnectionsDetails = await knex('users')
         .select('users.id', 'users.name', 'users.picture', 'users.email')
         .whereNot('users.id', id)
-        .whereNotIn('users.id', function () {
-          this.select('connections.user_sender')
+        .whereIn('users.id', function () {
+          this.select('connections.user_recipient')
             .from('connections')
-            .where({ state: 1 })
-            .andWhere(function () {
-              this.where('connections.user_recipient', id);
-            })
+            .where({ state: 1, user_sender: id })
             .union(function () {
-              this.select('connections.user_recipient')
+              this.select('connections.user_sender')
                 .from('connections')
-                .where({ state: 1 })
-                .andWhere('connections.user_sender', id);
+                .where({ state: 1, user_recipient: id });
             });
         });
   
@@ -45,8 +41,7 @@ class Connection_Model {
     } catch (error) {
       return { status: false, error: error.message };
     }
-  }
-  
+  }  
 
   async getRequestsForMe(id) {
     try {
