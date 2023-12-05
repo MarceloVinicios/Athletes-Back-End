@@ -3,12 +3,21 @@ const knex = require("../database/connection");
 class Connection_Model {
   async getAllUserForConnect(id) {
     try {
-      const connectedUsers = await knex('connections')
+      const usersSender = await knex('connections')
         .select('user_recipient')
         .where({ user_sender: id })
         .whereIn('state', [0, 1]);
   
-      const connectedUserIds = connectedUsers.map(user => user.user_recipient);
+      const usersSenderIds = usersSender.map(user => user.user_recipient);
+  
+      const usersRecipient = await knex('connections')
+        .select('user_sender')
+        .where({ user_recipient: id })
+        .whereIn('state', [0, 1]);
+  
+      const usersRecipientIds = usersRecipient.map(user => user.user_sender);
+  
+      const connectedUserIds = [...usersSenderIds, ...usersRecipientIds];
   
       const usersNotConnected = await knex('users')
         .select('id', 'name', 'picture', 'email')
@@ -17,9 +26,10 @@ class Connection_Model {
   
       return { status: true, response: usersNotConnected };
     } catch (error) {
-      return { status: false, error: "Error getting users not connected" };
+      return { status: false, error: "Erro ao obter usuários não conectados" };
     }
   }
+  
 
   async getMyConnections(id) {
     try {
@@ -48,7 +58,7 @@ class Connection_Model {
       const myRequestsDetails = await knex('connections')
         .select()
         .where({
-          state: 1,
+          state: 0,
           user_recipient: id,
         })
         .leftJoin('users', function () {
